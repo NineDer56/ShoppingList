@@ -1,4 +1,4 @@
-package com.example.shoppinglist.presentation
+package com.example.shoppinglist.presentation.activities
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
@@ -9,7 +9,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shoppinglist.R
-import com.example.shoppinglist.domain.ShopItem
+import com.example.shoppinglist.presentation.ShopListAdapter
+import com.example.shoppinglist.presentation.viewModels.MainViewModel
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,6 +19,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var recyclerViewShopItems: RecyclerView
     private lateinit var shopListAdapter: ShopListAdapter
+
+    private lateinit var buttonAdd: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,7 +31,8 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
+        initViews()
+        setOnClickListeners()
         setUpRecyclerView()
 
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
@@ -37,6 +42,16 @@ class MainActivity : AppCompatActivity() {
 
         setUpItemTouchHelper()
 
+    }
+
+    private fun initViews() {
+        buttonAdd = findViewById(R.id.buttonAddShopItem)
+    }
+
+    private fun setOnClickListeners() {
+        buttonAdd.setOnClickListener {
+            startActivity(ShopItemActivity.newIntentAddItem(this))
+        }
     }
 
     private fun setUpRecyclerView() {
@@ -57,20 +72,12 @@ class MainActivity : AppCompatActivity() {
                 )
             }
 
-
-//            shopListAdapter.setOnShopItemLongClickListener(object :
-//                ShopListAdapter.OnShopItemLongClickListener {
-//                override fun onShopItemLongClick(shopItem: ShopItem) {
-//                    viewModel.changeEnableState(shopItem)
-//                }
-//            })
-
             shopListAdapter.onShopItemLongClickListener = {
                 viewModel.changeEnableState(it)
             }
 
             shopListAdapter.onShopItemClickListener = {
-                TODO()
+                startActivity(ShopItemActivity.newIntentEditItem(applicationContext, it.id))
             }
         }
     }

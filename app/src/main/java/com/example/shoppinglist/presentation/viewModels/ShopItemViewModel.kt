@@ -1,4 +1,4 @@
-package com.example.shoppinglist.presentation
+package com.example.shoppinglist.presentation.viewModels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
