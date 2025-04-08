@@ -3,12 +3,8 @@ package com.example.shoppinglist.presentation
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.OnLongClickListener
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.AdapterView.OnItemLongClickListener
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shoppinglist.R
 import com.example.shoppinglist.domain.ShopItem
@@ -23,19 +19,17 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopListViewHolder>
             notifyDataSetChanged()
         }
 
-    private var onItemClickListener: OnItemClickListener? = null
+    var onShopItemLongClickListener: ((ShopItem) -> Unit)? = null
 
-    fun setOnItemClickListener(listener: OnItemClickListener) {
-        onItemClickListener = listener
-    }
+    var onShopItemClickListener: ((ShopItem) -> Unit)? = null
 
-    private var count =0
+    private var count = 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopListViewHolder {
         Log.d("ShopListAdapter", "onCreateViewHolder ${++count}")
-        val layoutId = when(viewType) {
-            VIEW_TYPE_ENABLED-> R.layout.item_shop_enabled
-            VIEW_TYPE_DISABLED-> R.layout.item_shop_disabled
+        val layoutId = when (viewType) {
+            VIEW_TYPE_ENABLED -> R.layout.item_shop_enabled
+            VIEW_TYPE_DISABLED -> R.layout.item_shop_disabled
             else -> throw RuntimeException("Unknown view type")
         }
         val view = LayoutInflater.from(parent.context).inflate(
@@ -54,8 +48,12 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopListViewHolder>
             textViewItemCount.text = item.count.toString()
 
             itemView.setOnLongClickListener {
-                onItemClickListener?.onItemClick(item)
+                onShopItemLongClickListener?.invoke(item)
                 true
+            }
+
+            itemView.setOnClickListener {
+                onShopItemClickListener?.invoke(item)
             }
         }
     }
@@ -80,11 +78,8 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopListViewHolder>
         val textViewItemCount: TextView = itemView.findViewById(R.id.textViewItemCount)
     }
 
-    interface OnItemClickListener {
-        fun onItemClick(shopItem: ShopItem)
-    }
 
-    companion object{
+    companion object {
         const val VIEW_TYPE_ENABLED = 1
         const val VIEW_TYPE_DISABLED = 0
 

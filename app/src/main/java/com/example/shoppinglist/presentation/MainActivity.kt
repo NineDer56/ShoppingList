@@ -1,18 +1,14 @@
 package com.example.shoppinglist.presentation
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View.OnLongClickListener
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shoppinglist.R
-import com.example.shoppinglist.data.ShopItemDatabase
 import com.example.shoppinglist.domain.ShopItem
 
 class MainActivity : AppCompatActivity() {
@@ -38,6 +34,9 @@ class MainActivity : AppCompatActivity() {
         viewModel.getShopList().observe(this) {
             shopListAdapter.shopItems = it
         }
+
+        setUpItemTouchHelper()
+
     }
 
     private fun setUpRecyclerView() {
@@ -59,11 +58,44 @@ class MainActivity : AppCompatActivity() {
             }
 
 
-            shopListAdapter.setOnItemClickListener(object : ShopListAdapter.OnItemClickListener {
-                override fun onItemClick(shopItem: ShopItem) {
-                    viewModel.changeEnableState(shopItem)
-                }
-            })
+//            shopListAdapter.setOnShopItemLongClickListener(object :
+//                ShopListAdapter.OnShopItemLongClickListener {
+//                override fun onShopItemLongClick(shopItem: ShopItem) {
+//                    viewModel.changeEnableState(shopItem)
+//                }
+//            })
+
+            shopListAdapter.onShopItemLongClickListener = {
+                viewModel.changeEnableState(it)
+            }
+
+            shopListAdapter.onShopItemClickListener = {
+                TODO()
+            }
+        }
+    }
+
+
+    private fun setUpItemTouchHelper() {
+        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+            0,
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val pos = viewHolder.adapterPosition
+                viewModel.deleteShopItem(shopListAdapter.shopItems[pos])
+            }
+
+        }).also {
+            it.attachToRecyclerView(recyclerViewShopItems)
         }
     }
 }
