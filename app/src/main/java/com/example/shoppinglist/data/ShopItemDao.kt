@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.shoppinglist.domain.ShopItem
@@ -11,7 +12,7 @@ import com.example.shoppinglist.domain.ShopItem
 @Dao
 interface ShopItemDao {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addShopItem(shopItem: ShopItem)
 
     @Delete
@@ -20,8 +21,8 @@ interface ShopItemDao {
     @Update
     fun editShopItem(shopItem: ShopItem)
 
-    @Query("SELECT * FROM shop_items WHERE id=:shopItemId")
-    fun getShopItem(shopItemId: Int) : LiveData<ShopItem>
+    @Query("SELECT * FROM shop_items WHERE id=:id")
+    fun getShopItem(id: Int) : ShopItem
 
     @Query("SELECT * FROM shop_items")
     fun getShopList(): LiveData<List<ShopItem>>

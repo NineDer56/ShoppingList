@@ -19,7 +19,7 @@ class ShopItemViewModel(application: Application) : AndroidViewModel(application
     private val getShopItemUseCase = GetShopItemUseCase(repository)
 
     private var _errorInputName = MutableLiveData<Boolean>()
-    val errorInputType: LiveData<Boolean>
+    val errorInputName: LiveData<Boolean>
         get() = _errorInputName
 
     private var _errorInputCount = MutableLiveData<Boolean>()
@@ -38,7 +38,7 @@ class ShopItemViewModel(application: Application) : AndroidViewModel(application
         val name = parseName(inputName)
         val count = parseCount(inputCount)
 
-        if (validateName(name) && validateCount(count)) {
+        if (validateNameAndCount(name, count)) {
             val shopItem = ShopItem(name = name, count = count, isEnable = true)
             addShopItemUseCase.addShopItem(shopItem)
             _shouldCloseScreen.value = Unit
@@ -50,12 +50,11 @@ class ShopItemViewModel(application: Application) : AndroidViewModel(application
         val name = parseName(inputName)
         val count = parseCount(inputCount)
 
-        if (validateName(name) && validateCount(count)) {
+        if (validateNameAndCount(name, count)) {
             val shopItem = _shopItem.value?.let {
                 val item = it.copy(name = name, count = count)
                 editShopItemUseCase.editShopItem(item)
                 _shouldCloseScreen.value = Unit
-                // TODO правильная реализация метода
             }
 
         }
@@ -63,23 +62,23 @@ class ShopItemViewModel(application: Application) : AndroidViewModel(application
 
     fun getShopItem(id: Int) {
         val item = getShopItemUseCase.getShopItem(id)
-        _shopItem.value = item.value
+        _shopItem.value = item
     }
 
     private fun parseName(input: String?) = input?.trim() ?: ""
 
     private fun parseCount(input: String?) = input?.trim()?.toIntOrNull() ?: 0
 
-    private fun validateName(input: String): Boolean {
-        return input.isNotBlank().also {
+    private fun validateNameAndCount(name: String, count: Int): Boolean {
+        val nameIsValid = name.isNotBlank().also {
             if (!it) _errorInputName.value = true
         }
-    }
 
-    private fun validateCount(input: Int): Boolean {
-        return (input > 0).also {
+        val countIsValid = (count > 0).also {
             if (!it) _errorInputCount.value = true
         }
+
+        return nameIsValid && countIsValid
     }
 
     fun resetErrorInputName() {
