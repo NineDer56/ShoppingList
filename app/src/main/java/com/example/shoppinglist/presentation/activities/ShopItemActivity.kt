@@ -45,7 +45,10 @@ class ShopItemActivity : AppCompatActivity() {
         parseIntent()
         initViews()
         viewModel = ViewModelProvider(this)[ShopItemViewModel::class.java]
+        chooseScreenMode()
+    }
 
+    private fun chooseScreenMode(){
         when (screenMode) {
             MODE_EDIT -> launchEditMode()
             MODE_ADD -> launchAddMode()
@@ -66,46 +69,9 @@ class ShopItemActivity : AppCompatActivity() {
             viewModel.editShopItem(name, count)
         }
 
-        viewModel.shouldCloseScreen.observe(this) {
-            finish()
-        }
-
-        viewModel.errorInputName.observe(this) {
-            textInputLayoutName.error = if (it) {
-                "Incorrect name"
-            } else {
-                null
-            }
-
-        }
-
-        viewModel.errorInputCount.observe(this) {
-            textInputLayoutCount.error = if(it) {
-                "Incorrect count"
-            } else {
-                null
-            }
-        }
-
-        editTextName.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                viewModel.resetErrorInputName()
-            }
-
-            override fun afterTextChanged(s: Editable?) {}
-        })
-
-        editTextCount.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                viewModel.resetErrorInputCount()
-            }
-
-            override fun afterTextChanged(s: Editable?) {}
-        })
+        observeShouldCloseScreen()
+        observeErrors()
+        addTextChangedListeners()
     }
 
     private fun launchAddMode() {
@@ -116,10 +82,18 @@ class ShopItemActivity : AppCompatActivity() {
             viewModel.addShopItem(name, count)
         }
 
+        observeShouldCloseScreen()
+        observeErrors()
+        addTextChangedListeners()
+    }
+
+    private fun observeShouldCloseScreen(){
         viewModel.shouldCloseScreen.observe(this) {
             finish()
         }
+    }
 
+    private fun observeErrors(){
         viewModel.errorInputName.observe(this) {
             textInputLayoutName.error = if (it) {
                 "Incorrect name"
@@ -136,7 +110,9 @@ class ShopItemActivity : AppCompatActivity() {
                 null
             }
         }
+    }
 
+    private fun addTextChangedListeners(){
         editTextName.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
