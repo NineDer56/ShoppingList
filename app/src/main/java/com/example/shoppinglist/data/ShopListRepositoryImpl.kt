@@ -21,7 +21,7 @@ class ShopListRepositoryImpl(context: Context) : ShopListRepository {
         shopItemDao.editShopItem(shopItem)
     }
 
-    override fun getShopItem(shopItemId: Int): LiveData<ShopItem> {
+    override fun getShopItem(shopItemId: Int): ShopItem {
         return shopItemDao.getShopItem(shopItemId)
     }
 
