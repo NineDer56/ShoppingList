@@ -21,7 +21,8 @@ abstract class ShopItemDatabase : RoomDatabase() {
                 context.applicationContext,
                 ShopItemDatabase::class.java,
                 "shop_items"
-            ).build()
+            ).allowMainThreadQueries()
+                .build()
                 .also { instance = it }
         }
     }
