@@ -1,5 +1,6 @@
 package com.example.shoppinglist.presentation
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -27,10 +28,20 @@ class ShopItemFragment : Fragment() {
     private var screenMode: String = UNKNOWN_MODE
     private var shopItemId: Int = UNDEFINED_ID
 
+    private lateinit var onEditingFinishedListener: OnEditingFinishedListener
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if(context is OnEditingFinishedListener){
+            onEditingFinishedListener = context
+        } else {
+            throw RuntimeException("Activity must implement OnEditingFinishedListener")
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         parseParams()
-
     }
 
 
@@ -60,7 +71,7 @@ class ShopItemFragment : Fragment() {
     private fun launchEditMode() {
         viewModel.getShopItem(shopItemId)
 
-        viewModel.shopItem.observe(this) {
+        viewModel.shopItem.observe(viewLifecycleOwner) {
             editTextName.setText(it.name)
             editTextCount.setText(it.count.toString())
         }
@@ -91,7 +102,7 @@ class ShopItemFragment : Fragment() {
 
     private fun observeShouldCloseScreen() {
         viewModel.shouldCloseScreen.observe(viewLifecycleOwner) {
-            activity?.onBackPressedDispatcher?.onBackPressed()
+            onEditingFinishedListener.onEditingFinished()
         }
     }
 
@@ -162,6 +173,11 @@ class ShopItemFragment : Fragment() {
         textInputLayoutCount = view.findViewById(R.id.textInputLayoutCount)
         editTextCount = view.findViewById(R.id.editTextCount)
         buttonSave = view.findViewById(R.id.buttonSave)
+    }
+
+
+    interface OnEditingFinishedListener {
+        fun onEditingFinished()
     }
 
 

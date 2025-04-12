@@ -20,7 +20,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import org.w3c.dom.Text
 
-class ShopItemActivity : AppCompatActivity() {
+class ShopItemActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedListener {
 
     private var screenMode = UNKNOWN_MODE
     private var shopItemId = UNDEFINED_ID
@@ -40,6 +40,10 @@ class ShopItemActivity : AppCompatActivity() {
         if(savedInstanceState == null) { // Если активити не пересоздавалась
             chooseScreenMode()
         }
+    }
+
+    override fun onEditingFinished() {
+        finish()
     }
 
     private fun chooseScreenMode() {
