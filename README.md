@@ -1,4 +1,4 @@
-﻿#ShoppingList
+﻿# ShoppingList
 Just a project to practise working with:
 |Tech stack|
 |------|
