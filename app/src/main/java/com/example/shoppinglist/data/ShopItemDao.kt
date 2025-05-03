@@ -7,23 +7,22 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.shoppinglist.domain.ShopItem
 
 @Dao
 interface ShopItemDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addShopItem(shopItem: ShopItem)
+    suspend fun addShopItem(shopItem: ShopItemDbModel)
 
     @Delete
-    fun deleteShopItem(shopItem: ShopItem)
+    suspend fun deleteShopItem(shopItem: ShopItemDbModel)
 
     @Update
-    fun editShopItem(shopItem: ShopItem)
+    suspend fun editShopItem(shopItem: ShopItemDbModel)
 
     @Query("SELECT * FROM shop_items WHERE id=:id")
-    fun getShopItem(id: Int) : ShopItem
+    suspend fun getShopItem(id: Int) : ShopItemDbModel
 
     @Query("SELECT * FROM shop_items")
-    fun getShopList(): LiveData<List<ShopItem>>
+    fun getShopList(): LiveData<List<ShopItemDbModel>>
 }

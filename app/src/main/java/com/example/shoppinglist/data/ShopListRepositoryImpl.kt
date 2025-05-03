@@ -1,31 +1,46 @@
 package com.example.shoppinglist.data
 
-import android.content.Context
+import android.app.Application
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.map
 import com.example.shoppinglist.domain.ShopItem
 import com.example.shoppinglist.domain.ShopListRepository
 
-class ShopListRepositoryImpl(context: Context) : ShopListRepository {
+class ShopListRepositoryImpl(application: Application) : ShopListRepository {
 
-    private var shopItemDao : ShopItemDao = ShopItemDatabase.getInstance(context).shopItemDao()
+    private val shopItemDao : ShopItemDao = ShopItemDatabase.getInstance(application).shopItemDao()
+    private val mapper = ShopItemMapper()
 
-    override fun addShopItem(shopItem: ShopItem) {
-        shopItemDao.addShopItem(shopItem)
+    override suspend fun addShopItem(shopItem: ShopItem) {
+        shopItemDao.addShopItem(mapper.mapEntityToDbModel(shopItem))
     }
 
-    override fun deleteShopItem(shopItem: ShopItem) {
-        shopItemDao.deleteShopItem(shopItem)
+    override suspend fun deleteShopItem(shopItem: ShopItem) {
+        shopItemDao.deleteShopItem(mapper.mapEntityToDbModel(shopItem))
     }
 
-    override fun editShopItem(shopItem: ShopItem) {
-        shopItemDao.editShopItem(shopItem)
+    override suspend fun editShopItem(shopItem: ShopItem) {
+        shopItemDao.editShopItem(mapper.mapEntityToDbModel(shopItem))
     }
 
-    override fun getShopItem(shopItemId: Int): ShopItem {
-        return shopItemDao.getShopItem(shopItemId)
+    override suspend fun getShopItem(shopItemId: Int): ShopItem {
+        val dbModel = shopItemDao.getShopItem(shopItemId)
+        return mapper.mapDbModelToEntity(dbModel)
     }
 
     override fun getShopList(): LiveData<List<ShopItem>> {
-        return shopItemDao.getShopList()
+        return shopItemDao.getShopList().map {
+            mapper.mapListDbModelToListEntity(it)
+        }
     }
+
+//    override fun getShopList(): LiveData<List<ShopItem>> {
+//        val dbModelList : LiveData<List<ShopItemDbModel>> =  shopItemDao.getShopList()
+//
+//        return MediatorLiveData<List<ShopItem>>().apply {
+//            addSource(dbModelList) {
+//                mapper.mapListDbModelToListEntity(it)
+//            }
+//        }
+//    }
 }
