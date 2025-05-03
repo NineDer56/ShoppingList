@@ -6,6 +6,7 @@ Just a project to practise working with:
 |Tech stack|
 |------|
 |Fragments|
+|Coroutines|
 |Clean architecture|
 |MVVM architecture|
 |RecyclerView|
