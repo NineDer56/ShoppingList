@@ -1,31 +1,46 @@
 package com.example.shoppinglist.data
 
-import android.content.Context
+import android.app.Application
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.map
 import com.example.shoppinglist.domain.ShopItem
 import com.example.shoppinglist.domain.ShopListRepository
 
-class ShopListRepositoryImpl(context: Context) : ShopListRepository {
+class ShopListRepositoryImpl(application: Application) : ShopListRepository {
 
-    private var shopItemDao : ShopItemDao = ShopItemDatabase.getInstance(context).shopItemDao()
+    private val shopItemDao : ShopItemDao = ShopItemDatabase.getInstance(application).shopItemDao()
+    private val mapper = ShopItemMapper()
 
     override fun addShopItem(shopItem: ShopItem) {
-        shopItemDao.addShopItem(shopItem)
+        shopItemDao.addShopItem(mapper.mapEntityToDbModel(shopItem))
     }
 
     override fun deleteShopItem(shopItem: ShopItem) {
-        shopItemDao.deleteShopItem(shopItem)
+        shopItemDao.deleteShopItem(mapper.mapEntityToDbModel(shopItem))
     }
 
     override fun editShopItem(shopItem: ShopItem) {
-        shopItemDao.editShopItem(shopItem)
+        shopItemDao.editShopItem(mapper.mapEntityToDbModel(shopItem))
     }
 
     override fun getShopItem(shopItemId: Int): ShopItem {
-        return shopItemDao.getShopItem(shopItemId)
+        val dbModel = shopItemDao.getShopItem(shopItemId)
+        return mapper.mapDbModelToEntity(dbModel)
     }
 
     override fun getShopList(): LiveData<List<ShopItem>> {
-        return shopItemDao.getShopList()
+        return shopItemDao.getShopList().map {
+            mapper.mapListDbModelToListEntity(it)
+        }
     }
+
+//    override fun getShopList(): LiveData<List<ShopItem>> {
+//        val dbModelList : LiveData<List<ShopItemDbModel>> =  shopItemDao.getShopList()
+//
+//        return MediatorLiveData<List<ShopItem>>().apply {
+//            addSource(dbModelList) {
+//                mapper.mapListDbModelToListEntity(it)
+//            }
+//        }
+//    }
 }

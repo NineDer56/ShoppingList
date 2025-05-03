@@ -13,17 +13,17 @@ import com.example.shoppinglist.domain.ShopItem
 interface ShopItemDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addShopItem(shopItem: ShopItem)
+    fun addShopItem(shopItem: ShopItemDbModel)
 
     @Delete
-    fun deleteShopItem(shopItem: ShopItem)
+    fun deleteShopItem(shopItem: ShopItemDbModel)
 
     @Update
-    fun editShopItem(shopItem: ShopItem)
+    fun editShopItem(shopItem: ShopItemDbModel)
 
     @Query("SELECT * FROM shop_items WHERE id=:id")
-    fun getShopItem(id: Int) : ShopItem
+    fun getShopItem(id: Int) : ShopItemDbModel
 
     @Query("SELECT * FROM shop_items")
-    fun getShopList(): LiveData<List<ShopItem>>
+    fun getShopList(): LiveData<List<ShopItemDbModel>>
 }
